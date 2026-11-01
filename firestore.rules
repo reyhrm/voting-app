@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /polls/current {
+      allow read: if true;
+      // Voters may only bump vote counters by exactly 1 on one option.
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['counts'])
+        && resource.data.open == true;
+      // Admin writes (create/reset/open/close) - tighten with Firebase Auth for production.
+      allow create, update: if true;
+    }
+  }
+}
