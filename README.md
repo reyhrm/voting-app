@@ -2,8 +2,8 @@
 
 Real-time voting for live events. React + Vite + Tailwind + Firebase Firestore, deploys to Vercel.
 
-- `/` – attendees vote (one vote per device per round), then see live results
-- `/results` – big-screen live results
+- `/` – attendees vote once per category (Masculino, Femenino) per device and see live results
+- `/resultados` – big-screen live results, Masculino and Femenino side by side
 - `/admin` – passcode-protected: publish a new poll, open/close voting, reset votes
 
 ## Setup
