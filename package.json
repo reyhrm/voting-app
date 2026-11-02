@@ -1,0 +1,14 @@
+{
+  "name": "event-vote",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:local": "wrangler d1 migrations apply event-vote-db --local",
+    "db:remote": "wrangler d1 migrations apply event-vote-db --remote",
+    "deploy": "wrangler deploy",
+    "test": "wrangler d1 execute event-vote-db --local --command \"DELETE FROM rate\" && node --test test/api.test.js"
+  },
+  "devDependencies": { "wrangler": "^4.0.0" }
+}
