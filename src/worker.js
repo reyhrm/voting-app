@@ -1,5 +1,7 @@
 // Event voting API: Cloudflare Worker + D1. Static files are served by the assets binding.
 
+import { SCHEMA } from "./schema.js";
+
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
 const MAX_PHOTO = 400 * 1024;
 const MAX_LOGO = 250 * 1024;
@@ -17,6 +19,19 @@ const json = (data, status = 200, extra = {}) =>
 
 const clean = (v, max) =>
   typeof v === "string" ? v.replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max) : "";
+
+// ---------- schema bootstrap ----------
+// Creates the tables on first use (idempotent), so a fresh database just works.
+let schemaReady = null;
+function ensureSchema(env) {
+  if (!schemaReady) {
+    schemaReady = (async () => {
+      const has = await env.DB.prepare("SELECT 1 AS ok FROM sqlite_master WHERE type = 'table' AND name = 'settings'").first();
+      if (!has) await env.DB.batch(SCHEMA.map((q) => env.DB.prepare(q)));
+    })().catch((e) => { schemaReady = null; throw e; });
+  }
+  return schemaReady;
+}
 
 // ---------- crypto helpers ----------
 async function hmacHex(secret, msg) {
@@ -337,6 +352,7 @@ export default {
     const path = url.pathname.replace(/\/+$/, "") || "/";
     try {
       if (!path.startsWith("/api/")) return env.ASSETS.fetch(request);
+      await ensureSchema(env);
 
       if (path.startsWith("/api/admin/")) return await handleAdmin(request, env, url, path);
 
