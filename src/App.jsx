@@ -1,5 +1,19 @@
 import { useEffect, useState } from "react";
+import QRCode from "qrcode";
 import { store, usingFirebase } from "./store.js";
+
+function ShareQR() {
+  const [src, setSrc] = useState("");
+  const url = window.location.origin + "/";
+  useEffect(() => { QRCode.toDataURL(url, { width: 480, margin: 2 }).then(setSrc); }, [url]);
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-2xl bg-white p-4 text-zinc-900">
+      {src && <img src={src} alt="QR para votar" className="h-44 w-44" />}
+      <p className="text-sm font-medium">Escanea para votar</p>
+      <p className="text-xs text-zinc-500 break-all">{url}</p>
+    </div>
+  );
+}
 
 const ADMIN_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || "admin";
 
@@ -137,6 +151,7 @@ function Admin({ poll }) {
         <button onClick={() => store.setOpen(!poll.open)} className="rounded-xl bg-zinc-800 py-3">{poll.open ? "Cerrar votación" : "Reabrir votación"}</button>
         <button onClick={() => confirm("¿Borrar todos los votos?") && store.resetVotes(poll.round)} className="rounded-xl bg-zinc-800 py-3 text-red-300">Reiniciar votos</button>
       </section>
+      <section className="flex justify-center"><ShareQR /></section>
       <section><h2 className="mb-3 text-lg font-semibold">Resultados en vivo</h2><AllResults poll={poll} /></section>
     </div>
   );
@@ -156,7 +171,7 @@ export default function App() {
         <p className="mt-2 text-sm text-zinc-500">{poll.open ? "● Votación abierta" : "Votación cerrada"}</p>
       </header>
       {path.startsWith("/admin") ? <Admin poll={poll} />
-        : screen ? <AllResults poll={poll} big />
+        : screen ? <div className="space-y-10"><AllResults poll={poll} big /><div className="flex justify-center"><ShareQR /></div></div>
         : <div className="space-y-10">
             {poll.categories.map((cat) => <CategoryVote key={cat.key} poll={poll} cat={cat} />)}
             <div><h2 className="mb-4 text-xl font-bold">Resultados en vivo</h2><AllResults poll={poll} /></div>
