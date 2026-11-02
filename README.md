@@ -3,6 +3,16 @@
 Mobile-first voting site for a live event. Spanish by default (English strings included).
 Runs entirely on **Cloudflare's free plan**: no Vercel, no server to manage, no credit card needed.
 
+## Easiest way to deploy (one command)
+
+On your Mac (Terminal), in this folder:
+
+```
+./deploy.sh
+```
+
+It installs everything, opens your browser to log in to Cloudflare (free account), creates the database and tables, deploys the site, asks you to choose an admin password, and prints your public links. Safe to run again. You only need [Node.js 20+](https://nodejs.org) first. The manual steps below do the same thing one at a time.
+
 ## Architecture
 
 ```
